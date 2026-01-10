@@ -8,7 +8,8 @@ def show_menu():
     print("1. Add a new task")
     print("2. View all tasks")
     print("3. Mark task as completed")
-    print("4. Exit")
+    print("4. View task summary")
+    print("5. Exit")
 
 def add_task():
     task_name = input("Enter task name: ")
@@ -40,10 +41,20 @@ def complete_task():
     except ValueError:
         print("Please enter a valid number.")
 
+def task_summary():
+    total_tasks = len(tasks)
+    completed_tasks = sum(task["completed"] for task in tasks)
+    pending_tasks = total_tasks - completed_tasks
+
+    print("\n===== Task Summary =====")
+    print(f"Total Tasks     : {total_tasks}")
+    print(f"Completed Tasks : {completed_tasks}")
+    print(f"Pending Tasks   : {pending_tasks}")
+
 def main():
     while True:
         show_menu()
-        choice = input("Enter your choice (1-4): ")
+        choice = input("Enter your choice (1-5): ")
 
         if choice == "1":
             add_task()
@@ -52,6 +63,8 @@ def main():
         elif choice == "3":
             complete_task()
         elif choice == "4":
+            task_summary()
+        elif choice == "5":
             print("Exiting Task Manager. Goodbye!")
             break
         else:
