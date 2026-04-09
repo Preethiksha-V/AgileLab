@@ -1,0 +1,70 @@
+Spring Boot CI/CD Pipeline (GitHub + Jenkins +
+Docker + Kubernetes)
+Step 1: Install Tools
+Install Java 17, Maven, Docker Desktop (enable Kubernetes), Jenkins, and Git.
+Step 2: Create Spring Boot Project
+pom.xml (important parts)
+<parent>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-parent</artifactId>
+ <version>3.2.5</version>
+</parent>
+<dependencies>
+ <dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-web</artifactId>
+ </dependency>
+</dependencies>
+App.java
+@SpringBootApplication
+public class App {
+ public static void main(String[] args) {
+ SpringApplication.run(App.class, args);
+ }
+}
+HelloController.java
+@RestController
+public class HelloController {
+ @GetMapping("/")
+ public String home() { return "App Running"; }
+}
+Step 3: Run Locally
+mvn spring-boot:run
+Step 4: Docker
+Dockerfile
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY target/app.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
+docker build -t springboot-app .
+docker run -p 8080:8080 springboot-app
+Step 5: Kubernetes
+deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: springboot-app
+spec:
+ replicas: 1
+ template:
+ spec:
+ containers:
+ - name: app
+ image: springboot-app
+ imagePullPolicy: Never
+Step 6: GitHub
+git init
+git add .
+git commit -m "init"
+git push origin main
+Step 7: Jenkins Pipeline
+pipeline {
+ agent any
+ stages {
+ stage('Build') { steps { sh 'mvn clean package' } }
+ stage('Docker') { steps { sh 'docker build -t app .' } }
+ stage('Deploy') { steps { sh 'kubectl apply -f deployment.yaml' } }
+ }
+}
+Step 8: Webhook
+Add webhook in GitHub: http://:8080/github-webhook/
